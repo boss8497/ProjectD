@@ -21,20 +21,22 @@ public partial class GameManager : MonoBehaviour{
         Initialize();
     }
     
+    //게임 실행시 초기화
     private async void Initialize(){
+        GameManager.BeginGameInitializeEvent();
         Application.targetFrameRate = 60;
         QualitySettings.vSyncCount  = 1;
-        GameManager.BeginGameInitializeEvent();
-
         await Initialize_Addressable();
+        GameManager.EndGameInitializeEvent();
+    }
+
+    //인트로 -> 인게임 로딩
+    public async void Loading(){
         await Initialize_ObjectPooling();
-        
-        
         await LoadData();
         GameManager.GameInitializeProgressEvent(0.7f);
 
         GameManager.GameInitializeProgressEvent(1.0f);
-        GameManager.EndGameInitializeEvent();
     }
 
     private async Task Initialize_Addressable(){
