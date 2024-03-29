@@ -7,11 +7,12 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 public class ObjectPoolingManager : MonoBehaviour{
-    public  static ObjectPoolingManager                      Instance;
-    public         GameObject                                content;
-    private        Dictionary<PoolingKey, Stack<GameObject>> pool = new ();
-    private        Dictionary<PoolingKey, ObjectPoolingData> poolDataDic;
-    private        bool                                      destroyObject = false;
+    public  static   ObjectPoolingManager                      Instance;
+    public           GameObject                                content;
+    private          Dictionary<PoolingKey, Stack<GameObject>> pool = new ();
+    private          Dictionary<PoolingKey, ObjectPoolingData> poolDataDic;
+    private          bool                                      destroyObject = false;
+    private readonly string                                    dataPath          = "Assets/Data/ObjectPoolingDatas.asset";
     private void Awake(){
         if (Instance == null){
             Instance = this;
@@ -27,7 +28,7 @@ public class ObjectPoolingManager : MonoBehaviour{
     }
 
     private async Task LoadData(){
-        var poolDatas = await AddressableManager.Instance.LoadAsset<ObjectPoolingDatas>("Assets/Data/ObjectPoolingDatas.asset");
+        var poolDatas = await AddressableManager.Instance.LoadAsset<ObjectPoolingDatas>(dataPath);
         poolDataDic = poolDatas.objectPoolingDatas.ToDictionary(r => r.key);
     }
 
@@ -61,21 +62,13 @@ public class ObjectPoolingManager : MonoBehaviour{
         }
     }
 
-    public static bool IsPoolingObject(GameObject obj, out PoolObject poolObject){
-        poolObject = obj?.GetComponent<PoolObject>();
-        return poolObject != null;
-    } 
-    
-    public static void IsPoolingObjectAndPushOrDestroy(GameObject obj){
-        if (obj == null) return;
-        var poolObject = obj.GetComponent<PoolObject>();
-        if (poolObject != null){
-            Instance.Push(poolObject.key, obj);
+
+    public ObjectPoolingData GetPoolingData(PoolingKey key){
+        if (poolDataDic.ContainsKey(key)){
+            return poolDataDic[key];
         }
-        else{
-            GameObject.Destroy(obj);
-        }
-    } 
+        return null;
+    }
 
     public GameObject Pop(PoolingKey key){
         return pool[key].Pop();
@@ -88,14 +81,37 @@ public class ObjectPoolingManager : MonoBehaviour{
         obj.transform.localPosition = Vector3.zero;
         return obj;
     }
+    
+    public static void Push(GameObject obj){
+        if (obj == null) return;
+        var poolObject = obj.GetComponent<PoolObject>();
+        if (poolObject != null){
+            Instance.Push(poolObject.key, obj);
+        }
+        else{
+            GameObject.Destroy(obj);
+        }
+    } 
 
-    public void Push(PoolingKey key, GameObject obj){
+    private void Push(PoolingKey key, GameObject obj){
         if (destroyObject) return;
         var tr = obj.transform;
         tr.parent        = content.transform;
         tr.localPosition = Vector3.zero;
         obj.SetActive(false);
-        
-        pool[key].Push(obj);
+
+
+        var poolinfo = GetPoolingData(key);
+        if (poolinfo == null){
+            GameObject.Destroy(obj);
+            return;
+        }
+
+        if (poolinfo.maxCount <= pool[key].Count){
+            GameObject.Destroy(obj);
+        }
+        else{
+            pool[key].Push(obj);
+        }
     }
 }
