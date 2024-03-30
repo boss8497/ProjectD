@@ -12,4 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 971538592c452594a97bd45950b4f10c, type: 3}
   m_Name: ObjectPoolingDatas
   m_EditorClassIdentifier: 
-  objectPoolingDatas: []
+  objectPoolingDatas:
+  - key: 0
+    path: 
+    maxCount: 0
