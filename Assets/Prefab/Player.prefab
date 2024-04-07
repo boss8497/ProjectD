@@ -104,6 +104,8 @@ MonoBehaviour:
   arrow: {fileID: 687489252069892701}
   fixedAngle: 90
   angle: 30
+  angleRotateSpeed: 0.5
+  moveSpeed: 0.1
 --- !u!114 &1952548085467879752
 MonoBehaviour:
   m_ObjectHideFlags: 0
