@@ -61,6 +61,9 @@ public partial class GameManager : MonoBehaviour{
 
     //Load GameData
     private async Task LoadData(){
-        
+        if (StageDataManager.Instance == null){
+            StageDataManager.Instance = new StageDataManager();
+            await StageDataManager.Instance.Initialize();
+        }
     }
 }

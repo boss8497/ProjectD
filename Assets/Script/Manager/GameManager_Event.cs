@@ -26,4 +26,10 @@ public partial class GameManager : MonoBehaviour{
     public static void EndEnterGameEvent(){
         OnEndEnterGame?.Invoke();
     }
+    
+    
+    public static event System.Action<Transform> PlayerMove;
+    public static void PlayerMoveEvent(Transform tr){
+        PlayerMove?.Invoke(tr);
+    }
 }

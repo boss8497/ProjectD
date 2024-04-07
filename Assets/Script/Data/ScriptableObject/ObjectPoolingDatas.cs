@@ -5,6 +5,8 @@ using UnityEngine;
 
 public enum PoolingKey{
     None = 0,
+    Circle,
+    Rect,
 }
 
 [Serializable]

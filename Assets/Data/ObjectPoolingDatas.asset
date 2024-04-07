@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: ObjectPoolingDatas
   m_EditorClassIdentifier: 
   objectPoolingDatas:
-  - key: 0
-    path: 
-    maxCount: 0
+  - key: 1
+    path: Assets/Prefab/Circle.prefab
+    maxCount: 10
