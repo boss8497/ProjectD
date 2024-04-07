@@ -22,23 +22,23 @@ MonoBehaviour:
         direction: 0
         moveDirection: 2
         size: 0.5
-        speed: 0.1
+        speed: 3
       - poolingKey: 1
         type: 0
         direction: 1
         moveDirection: 3
         size: 0.5
-        speed: 0.1
+        speed: 3
     - blocks:
       - poolingKey: 1
         type: 0
         direction: 2
         moveDirection: 1
         size: 0.5
-        speed: 0.1
+        speed: 3
       - poolingKey: 1
         type: 0
         direction: 3
         moveDirection: 0
         size: 0.5
-        speed: 0.1
+        speed: 3

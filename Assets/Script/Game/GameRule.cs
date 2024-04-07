@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
@@ -20,9 +21,9 @@ public class GameRule : MonoBehaviour{
     public Transform content;
     public GameObject player;
 
-    private int             score;
-    private StageInfo       stageInfo;
-    private Runtime_Pattern runtime_pattern;
+    private int                  score;
+    private StageInfo            stageInfo;
+    private List<Runtime_Pattern> runtime_patterns;
 
     private void Awake(){
         GameManager.OnBeginEnterGame += OnBeginEnterGame;
@@ -47,12 +48,19 @@ public class GameRule : MonoBehaviour{
     }
 
     private void LoadPattern(){
+        runtime_patterns = new List<Runtime_Pattern>();
         foreach (var pattern in stageInfo.patterns){
             var rpattern = new Runtime_Pattern();
             rpattern.blocks = new List<Runtime_Block>();
             foreach (var block in pattern.blocks){
                 rpattern.blocks.Add(LoadBlock(block));
             }
+            runtime_patterns.Add(rpattern);
+        }
+
+        var first = runtime_patterns.FirstOrDefault();
+        foreach (var block in first.blocks){
+            block.controller.StartMove();
         }
     }
 
