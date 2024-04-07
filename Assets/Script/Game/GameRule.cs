@@ -21,9 +21,10 @@ public class GameRule : MonoBehaviour{
     public Transform content;
     public GameObject player;
 
-    private int                  score;
-    private StageInfo            stageInfo;
+    private int                   score;
+    private StageInfo             stageInfo;
     private List<Runtime_Pattern> runtime_patterns;
+    private SpriteRenderer        mapSr;
 
     private void Awake(){
         GameManager.OnBeginEnterGame += OnBeginEnterGame;
@@ -43,8 +44,28 @@ public class GameRule : MonoBehaviour{
         if (stageInfo == null){
             Debug.LogError("not found Stage Info");
         }
+        mapSr = map.GetComponent<SpriteRenderer>();
 
         LoadPattern();
+        LoadPlayer();
+        
+        
+        var first = runtime_patterns.FirstOrDefault();
+        foreach (var block in first.blocks){
+            block.controller.StartMove();
+        }
+
+
+    }
+
+    public void Release(){
+        
+    }
+
+    private void LoadPlayer(){
+        player = ObjectPoolingManager.Instance.Pop(PoolingKey.Player, content);
+        var controller = player.GetComponent<Player_Controller>();
+        controller.Initialize(Direction.Left, mapSr);
     }
 
     private void LoadPattern(){
@@ -57,11 +78,6 @@ public class GameRule : MonoBehaviour{
             }
             runtime_patterns.Add(rpattern);
         }
-
-        var first = runtime_patterns.FirstOrDefault();
-        foreach (var block in first.blocks){
-            block.controller.StartMove();
-        }
     }
 
     private Runtime_Block LoadBlock(Block _block){
@@ -69,7 +85,7 @@ public class GameRule : MonoBehaviour{
         rBlock.blockinfo  = _block;
         rBlock.gameObject = ObjectPoolingManager.Instance.Pop(rBlock.blockinfo.poolingKey, content);
         rBlock.controller = rBlock.gameObject.GetComponent<Block_Controller>();
-        rBlock.controller.SetData(_block, map.transform);
+        rBlock.controller.SetData(_block, map.transform, mapSr);
         return rBlock;
     }
 }

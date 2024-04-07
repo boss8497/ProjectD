@@ -13,10 +13,10 @@ public class Block_Controller : MonoBehaviour{
     private Vector3 startPosition;
     private Vector3 endPosition;
 
-    public void SetData(Block _block, Transform _map){
+    public void SetData(Block _block, Transform _map, SpriteRenderer _mapSr){
         blockinfo = _block;
         map       = _map;
-        mapSr     = map.GetComponent<SpriteRenderer>();
+        mapSr     = _mapSr;
         SetPosition();
         StopMove();
     }
