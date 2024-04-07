@@ -16,3 +16,6 @@ MonoBehaviour:
   - key: 1
     path: Assets/Prefab/Circle.prefab
     maxCount: 10
+  - key: 3
+    path: Assets/Prefab/Player.prefab
+    maxCount: 1
