@@ -17,6 +17,7 @@ public class Block_Controller : MonoBehaviour{
         blockinfo = _block;
         map       = _map;
         mapSr     = map.GetComponent<SpriteRenderer>();
+        SetPosition();
     }
 
     private void SetPosition(){
@@ -27,34 +28,35 @@ public class Block_Controller : MonoBehaviour{
 
         switch (blockinfo.direction){
             case Direction.Top:
-                pos.y = mapSr.size.y / 2 - blockSr.bounds.size.y / 2;
+                pos.y = mapSr.bounds.size.y / 2 - blockSr.bounds.size.y / 2;
                 break;
             case Direction.Bottom:
-                pos.y = blockSr.bounds.size.y / 2 - mapSr.size.y / 2;
+                pos.y = blockSr.bounds.size.y / 2 - mapSr.bounds.size.y / 2;
                 break;
             case Direction.Left:
-                pos.x = mapSr.size.x / 2 - blockSr.bounds.size.x / 2;
+                pos.x = blockSr.bounds.size.x / 2 - mapSr.bounds.size.x   / 2;
                 break;
             case Direction.Right:
-                pos.x = blockSr.bounds.size.x / 2 - mapSr.size.x / 2;
+                pos.x = mapSr.bounds.size.x / 2 - blockSr.bounds.size.x / 2;
                 break;
         }
 
         switch (blockinfo.moveDirection){
             case MoveDirection.TopToBottom:
-                pos.y = mapSr.size.y / 2 - blockSr.bounds.size.y / 2;
+                pos.y = mapSr.bounds.size.y / 2 - blockSr.bounds.size.y / 2;
                 break;
             case MoveDirection.BottomToTop:
-                pos.y = blockSr.bounds.size.y / 2 - mapSr.size.y / 2;
+                pos.y = blockSr.bounds.size.y / 2 - mapSr.bounds.size.y / 2;
                 break;
             case MoveDirection.LeftToRight:
-                pos.x = mapSr.size.x / 2 - blockSr.bounds.size.x / 2;
+                pos.x = blockSr.bounds.size.x / 2 - mapSr.bounds.size.x / 2;
                 break;
             case MoveDirection.RightToLeft:
-                pos.x = blockSr.bounds.size.x / 2 - mapSr.size.x / 2;
+                pos.x = mapSr.bounds.size.x   / 2 - blockSr.bounds.size.x / 2;
                 break;
         }
 
-        startPosition = transform.position;
+        transform.position   = pos;
+        startPosition = pos;
     }
 }

@@ -28,15 +28,19 @@ public partial class GameManager : MonoBehaviour{
         QualitySettings.vSyncCount  = 1;
         await Initialize_Addressable();
         GameManager.EndGameInitializeEvent();
+
+        await Loading();
     }
 
     //인트로 -> 인게임 로딩
-    public async void Loading(){
+    public async Task Loading(){
         await Initialize_ObjectPooling();
         await LoadData();
         GameManager.GameInitializeProgressEvent(0.7f);
 
         GameManager.GameInitializeProgressEvent(1.0f);
+
+        GameManager.BeginEnterGame();
     }
 
     private async Task Initialize_Addressable(){
