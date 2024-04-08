@@ -74,9 +74,9 @@ public class ObjectPoolingManager : MonoBehaviour{
         return pool[key].Pop();
     }
     
-    public GameObject Pop(PoolingKey key, Transform parent){
+    public GameObject Pop(PoolingKey key, Transform parent, bool active = true){
         var obj = pool[key].Pop();
-        obj.SetActive(true);
+        obj.SetActive(active);
         obj.transform.parent        = parent;
         obj.transform.localPosition = Vector3.zero;
         return obj;

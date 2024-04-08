@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stageInfos:
   - level: 1
-    map: {fileID: 0}
+    stagePrefab: {fileID: 7415920072481193915, guid: 274a2b3c61a37b84bba535ea4f055e79, type: 3}
     patterns:
     - blocks:
       - poolingKey: 1

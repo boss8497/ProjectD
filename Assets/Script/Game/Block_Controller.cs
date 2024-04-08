@@ -89,6 +89,7 @@ public class Block_Controller : MonoBehaviour{
     public void StopMove(){
         StopAllCoroutines();
         gameObject.SetActive(false);
+        transform.position = startPosition;
     }
 
     public void StartMove(){

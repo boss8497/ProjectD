@@ -14,6 +14,10 @@ public class Player_Controller : MonoBehaviour{
     private SpriteRenderer      mapSr;
     private List<Runtime_Block> blocks = new List<Runtime_Block>();
     private bool                isMove = false;
+    private Runtime_Coin        coin;
+
+    private Coroutine angleCoroutine;
+    private Coroutine collisionBlockCoroutine;
 
     private void OnEnable(){
         GameManager.SetBlock   += SetBlock;
@@ -28,6 +32,21 @@ public class Player_Controller : MonoBehaviour{
 
     private void GameResult(bool arg1, int arg2){
         StopAllCoroutines();
+    }
+
+    private void SetBlock(List<Runtime_Block> objs){
+        if (collisionBlockCoroutine != null){
+            StopCoroutine(collisionBlockCoroutine);
+            collisionBlockCoroutine = null;
+        }
+        
+        blocks.Clear();
+        blocks.AddRange(objs);
+        collisionBlockCoroutine = StartCoroutine(CoCollisionBlock());
+    }
+
+    public void SetCoin(Runtime_Coin _coin){
+        coin = _coin;
     }
 
     public void Initialize(Direction dir, SpriteRenderer _mapSr){
@@ -58,7 +77,10 @@ public class Player_Controller : MonoBehaviour{
     }
 
     private void OnMouseUp(){
-        StopCoroutine(CoMoveAngle(0));
+        if (angleCoroutine != null){
+            StopCoroutine(angleCoroutine);
+            angleCoroutine = null;
+        }
         arrow.gameObject.SetActive(false);
         StartCoroutine(CoMovePlayer());
     }
@@ -84,6 +106,11 @@ public class Player_Controller : MonoBehaviour{
         var resultPos = Vector3.zero;
         while (true){
             tr.position += dirVector;
+
+            if (CoinCollision()){
+                coin = null;
+                GameManager.OnCollisionCoinEvent();
+            }
 
             if (tr.position.x <= minVector.x){
                 resultPos.x = minVector.x;
@@ -138,24 +165,14 @@ public class Player_Controller : MonoBehaviour{
         tr.position = resultPos;
         isMove      = false;
     }
-
-    private void SetBlock(List<Runtime_Block> objs){
-        StopCoroutine(CoCollisionBlock());
-        blocks.Clear();
-        blocks.AddRange(objs);
-        StartCoroutine(CoCollisionBlock());
-    }
     
     IEnumerator CoCollisionBlock(){
         while (true){
             foreach (var block in blocks){
-                var blockTr = block.gameObject.transform;
-
                 switch (block.blockinfo.type){
                     case BlockType.Circle:{
-                        var distance  = (transform.position - blockTr.position).sqrMagnitude;
-                        var sumRadius =  sr.bounds.size.x * 0.5f + block.controller.blockSr.bounds.size.x * 0.5f;
-                        if (distance < sumRadius * sumRadius){
+                        if (CircleAndCircleCollision(sr.bounds, transform.position, 
+                                                     block.controller.blockSr.bounds, block.gameObject.transform.position)){
                             GameManager.OnCollisionBlockEvent();
                             yield break;
                         }
@@ -170,10 +187,29 @@ public class Player_Controller : MonoBehaviour{
         }
     }
 
+    private bool CircleAndCircleCollision(Bounds lbounds, Vector3 lpos, Bounds rbounds, Vector3 rpos){
+        var distance  = (lpos - rpos).sqrMagnitude;
+        var sumRadius = lbounds.size.x * 0.5f + rbounds.size.x * 0.5f;
+        if (distance < sumRadius * sumRadius){
+            return true;
+        }
+        return false;
+    }
+
+    private bool CoinCollision(){
+        if (coin == null) return false;
+        
+        return CircleAndCircleCollision(sr.bounds, transform.position,
+                                        coin.sr.bounds, coin.gameObject.transform.position);
+    }
+
     private void OnMouseDown(){
         if (isMove) return;
+        if (angleCoroutine != null){
+            StopCoroutine(angleCoroutine);
+            angleCoroutine = null;
+        }
         
-        StopCoroutine(CoMoveAngle(0));
         arrow.gameObject.SetActive(true);
         arrow.rotation = new Quaternion();
 
@@ -183,7 +219,7 @@ public class Player_Controller : MonoBehaviour{
         var dotResult   = Vector3.Dot(tr.up, Vector3.zero - dirPos);
         var resultAngle = dotResult >= 0 ? fixedAngle - targetAngle : fixedAngle + targetAngle;
 
-        StartCoroutine(CoMoveAngle(resultAngle));
+        angleCoroutine = StartCoroutine(CoMoveAngle(resultAngle));
     }
 
     IEnumerator CoMoveAngle(float targetAngel){

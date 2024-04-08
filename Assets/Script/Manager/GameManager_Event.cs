@@ -42,9 +42,16 @@ public partial class GameManager : MonoBehaviour{
     public static void OnCollisionBlockEvent(){
         OnCollisionBlock?.Invoke();
     }
+    
+    public static event System.Action OnCollisionCoin;
+    public static void OnCollisionCoinEvent(){
+        OnCollisionCoin?.Invoke();
+    }
 
     public static event System.Action<bool, int> GameResult;
     public static void GameResultEvent(bool isWin, int score){
         GameResult?.Invoke(isWin, score);
     }
+    
+    
 }
