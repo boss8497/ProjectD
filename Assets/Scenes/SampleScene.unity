@@ -662,6 +662,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 226739443}
     m_Modifications:
+    - target: {fileID: 6336690410046094996, guid: 274a2b3c61a37b84bba535ea4f055e79, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7415920072481193915, guid: 274a2b3c61a37b84bba535ea4f055e79, type: 3}
       propertyPath: m_Name
       value: Stage

@@ -103,8 +103,8 @@ MonoBehaviour:
   sr: {fileID: 4436670360944818114}
   arrow: {fileID: 687489252069892701}
   fixedAngle: 90
-  angle: 30
-  angleRotateSpeed: 0.5
+  angle: 60
+  angleRotateSpeed: 1
   moveSpeed: 0.1
 --- !u!114 &1952548085467879752
 MonoBehaviour:
