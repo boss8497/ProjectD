@@ -28,10 +28,12 @@ public class GameRule : MonoBehaviour{
 
     private void Awake(){
         GameManager.OnBeginEnterGame += OnBeginEnterGame;
+        GameManager.OnCollisionBlock += OnCollisionBlock;
     }
 
     private void OnDestroy(){
         GameManager.OnBeginEnterGame -= OnBeginEnterGame;
+        GameManager.OnCollisionBlock -= OnCollisionBlock;
     }
 
     private void OnBeginEnterGame(){
@@ -46,16 +48,16 @@ public class GameRule : MonoBehaviour{
         }
         mapSr = map.GetComponent<SpriteRenderer>();
 
-        LoadPattern();
         LoadPlayer();
+        LoadPattern();
         
         
         var first = runtime_patterns.FirstOrDefault();
         foreach (var block in first.blocks){
             block.controller.StartMove();
         }
-
-
+        
+        GameManager.SetBlockEvent(first.blocks);
     }
 
     public void Release(){
@@ -87,5 +89,18 @@ public class GameRule : MonoBehaviour{
         rBlock.controller = rBlock.gameObject.GetComponent<Block_Controller>();
         rBlock.controller.SetData(_block, map.transform, mapSr);
         return rBlock;
+    }
+    
+    private void OnCollisionBlock(){
+        Fail();
+    }
+
+    public void Win(){
+        
+    }
+    
+    public void Fail(){
+        Debug.Log($"Fail");
+        GameManager.GameResultEvent(false, 0);
     }
 }

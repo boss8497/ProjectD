@@ -13,6 +13,19 @@ public class Block_Controller : MonoBehaviour{
     private Vector3 startPosition;
     private Vector3 endPosition;
 
+    private void OnEnable(){
+        GameManager.GameResult += GameResult;
+    }
+
+    private void OnDisable(){
+        GameManager.GameResult -= GameResult;
+    }
+
+    private void GameResult(bool arg1, int arg2){
+        StopAllCoroutines();
+    }
+
+
     public void SetData(Block _block, Transform _map, SpriteRenderer _mapSr){
         blockinfo = _block;
         map       = _map;

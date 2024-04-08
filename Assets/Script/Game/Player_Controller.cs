@@ -11,7 +11,24 @@ public class Player_Controller : MonoBehaviour{
     public float          angleRotateSpeed;
     public float          moveSpeed;
 
-    private SpriteRenderer mapSr;
+    private SpriteRenderer      mapSr;
+    private List<Runtime_Block> blocks = new List<Runtime_Block>();
+    private bool                isMove = false;
+
+    private void OnEnable(){
+        GameManager.SetBlock   += SetBlock;
+        GameManager.GameResult += GameResult;
+        
+    }
+
+    private void OnDisable(){
+        GameManager.SetBlock   -= SetBlock;
+        GameManager.GameResult -= GameResult;
+    }
+
+    private void GameResult(bool arg1, int arg2){
+        StopAllCoroutines();
+    }
 
     public void Initialize(Direction dir, SpriteRenderer _mapSr){
         mapSr = _mapSr;
@@ -41,12 +58,13 @@ public class Player_Controller : MonoBehaviour{
     }
 
     private void OnMouseUp(){
-        StopAllCoroutines();
+        StopCoroutine(CoMoveAngle(0));
         arrow.gameObject.SetActive(false);
         StartCoroutine(CoMovePlayer());
     }
 
     IEnumerator CoMovePlayer(){
+        isMove = true;
         var tr          = transform;
         var isLeft      = tr.position.x <= 0;
         var targetAngle = arrow.rotation.eulerAngles.z;
@@ -115,12 +133,47 @@ public class Player_Controller : MonoBehaviour{
                 break;
             }
             yield return null;
+            
         }
         tr.position = resultPos;
+        isMove      = false;
+    }
+
+    private void SetBlock(List<Runtime_Block> objs){
+        StopCoroutine(CoCollisionBlock());
+        blocks.Clear();
+        blocks.AddRange(objs);
+        StartCoroutine(CoCollisionBlock());
+    }
+    
+    IEnumerator CoCollisionBlock(){
+        while (true){
+            foreach (var block in blocks){
+                var blockTr = block.gameObject.transform;
+
+                switch (block.blockinfo.type){
+                    case BlockType.Circle:{
+                        var distance  = (transform.position - blockTr.position).sqrMagnitude;
+                        var sumRadius =  sr.bounds.size.x * 0.5f + block.controller.blockSr.bounds.size.x * 0.5f;
+                        if (distance < sumRadius * sumRadius){
+                            GameManager.OnCollisionBlockEvent();
+                            yield break;
+                        }
+                    }
+                        break;
+                    case BlockType.Rect:
+                        break;
+                }
+            }
+
+            yield return null;
+        }
     }
 
     private void OnMouseDown(){
-        StopAllCoroutines();
+        if (isMove) return;
+        
+        StopCoroutine(CoMoveAngle(0));
         arrow.gameObject.SetActive(true);
         arrow.rotation = new Quaternion();
 
