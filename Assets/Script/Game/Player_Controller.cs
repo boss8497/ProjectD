@@ -107,7 +107,7 @@ public class Player_Controller : MonoBehaviour{
         while (true){
             tr.position += dirVector;
 
-            if (CoinCollision()){
+            if (CoinCollision(coin)){
                 coin = null;
                 GameManager.OnCollisionCoinEvent();
             }
@@ -164,6 +164,9 @@ public class Player_Controller : MonoBehaviour{
         }
         tr.position = resultPos;
         isMove      = false;
+        if (coin == null){
+            GameManager.OnCreateCoinRequestEvent();
+        }
     }
     
     IEnumerator CoCollisionBlock(){
@@ -196,11 +199,11 @@ public class Player_Controller : MonoBehaviour{
         return false;
     }
 
-    private bool CoinCollision(){
-        if (coin == null) return false;
+    public bool CoinCollision(Runtime_Coin _coin){
+        if (_coin == null) return false;
         
         return CircleAndCircleCollision(sr.bounds, transform.position,
-                                        coin.sr.bounds, coin.gameObject.transform.position);
+                                        _coin.sr.bounds, _coin.gameObject.transform.position);
     }
 
     private void OnMouseDown(){

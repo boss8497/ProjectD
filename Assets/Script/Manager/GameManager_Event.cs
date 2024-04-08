@@ -54,4 +54,9 @@ public partial class GameManager : MonoBehaviour{
     }
     
     
+    public static event System.Action OnCreateCoinRequest;
+    public static void OnCreateCoinRequestEvent(){
+        OnCreateCoinRequest?.Invoke();
+    }
+    
 }

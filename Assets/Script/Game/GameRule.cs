@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -43,22 +44,28 @@ public class GameRule : MonoBehaviour{
     private Runtime_Pattern       currentPattern;
 
     private void Awake(){
-        GameManager.OnBeginEnterGame += OnBeginEnterGame;
-        GameManager.OnCollisionBlock += OnCollisionBlock;
-        GameManager.OnCollisionCoin  += OnCollisionCoin;
+        GameManager.OnBeginEnterGame    += OnBeginEnterGame;
+        GameManager.OnCollisionBlock    += OnCollisionBlock;
+        GameManager.OnCollisionCoin     += OnCollisionCoin;
+        GameManager.OnCreateCoinRequest += OnCreateCoinRequest;
     }
 
     private void OnDestroy(){
-        GameManager.OnBeginEnterGame -= OnBeginEnterGame;
-        GameManager.OnCollisionBlock -= OnCollisionBlock;
-        GameManager.OnCollisionCoin  -= OnCollisionCoin;
+        GameManager.OnBeginEnterGame    -= OnBeginEnterGame;
+        GameManager.OnCollisionBlock    -= OnCollisionBlock;
+        GameManager.OnCollisionCoin     -= OnCollisionCoin;
+        GameManager.OnCreateCoinRequest -= OnCreateCoinRequest;
+    }
+
+    private void OnCreateCoinRequest(){
+        SetCoin();
     }
 
     private void OnBeginEnterGame(){
         Initialize();
     }
 
-    public void Initialize(){
+    public async void Initialize(){
         score     = 0;
         stageInfo = StageDataManager.Instance.GetStageInfo(level);
         if (stageInfo == null){
@@ -71,7 +78,7 @@ public class GameRule : MonoBehaviour{
         LoadPattern();
         LoadCoint();
         NextPattern();
-        SetCoin();
+        await SetCoin();
     }
 
     public void Release(){
@@ -139,10 +146,15 @@ public class GameRule : MonoBehaviour{
         GameManager.SetBlockEvent(currentPattern.blocks);
     }
 
-    private void SetCoin(){
-        var pos = new Vector3(Random.Range(coin.min.x, coin.max.x), Random.Range(coin.min.y, coin.max.y));
-        coin.gameObject.transform.position = pos;
+    private async Task SetCoin(){
+        coin.gameObject.transform.position = new Vector3(Random.Range(coin.min.x, coin.max.x), Random.Range(coin.min.y, coin.max.y));;
         coin.gameObject.SetActive(true);
+
+        while (player.controller.CoinCollision(coin)){
+            coin.gameObject.transform.position = new Vector3(Random.Range(coin.min.x, coin.max.x), Random.Range(coin.min.y, coin.max.y));
+            await Task.Delay(1);
+        }
+        
         player.controller.SetCoin(coin);
     }
     
