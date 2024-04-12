@@ -13,15 +13,17 @@ public class Player_Controller : MonoBehaviour{
 
     private SpriteRenderer      mapSr;
     private List<Runtime_Block> blocks = new List<Runtime_Block>();
-    private bool                isMove = false;
     private Runtime_Coin        coin;
 
     private Coroutine angleCoroutine;
     private Coroutine collisionBlockCoroutine;
+    private Coroutine movePlayerCoroutine;
 
     private Vector3 dirVector;
     public Vector3 DirVector => dirVector;
 
+    private bool isMove     = false;
+    private bool gameResult = false;
     private void OnEnable(){
         GameManager.SetBlock   += SetBlock;
         GameManager.GameResult += GameResult;
@@ -35,6 +37,24 @@ public class Player_Controller : MonoBehaviour{
 
     private void GameResult(GameResult result){
         StopAllCoroutines();
+        ResetCoroutine();
+        gameResult = true;
+    }
+
+    private void ResetCoroutine(){
+        StopAllCoroutines();
+        if (angleCoroutine != null){
+            StopCoroutine(angleCoroutine);
+            angleCoroutine = null;
+        }
+        if (collisionBlockCoroutine != null){
+            StopCoroutine(collisionBlockCoroutine);
+            collisionBlockCoroutine = null;
+        }
+        if (movePlayerCoroutine != null){
+            StopCoroutine(movePlayerCoroutine);
+            movePlayerCoroutine = null;
+        }
     }
 
     private void SetBlock(List<Runtime_Block> objs){
@@ -53,15 +73,9 @@ public class Player_Controller : MonoBehaviour{
     }
 
     public void Initialize(Direction dir, SpriteRenderer _mapSr){
-        if (angleCoroutine != null){
-            StopCoroutine(angleCoroutine);
-            angleCoroutine = null;
-        }
-        if (collisionBlockCoroutine != null){
-            StopCoroutine(collisionBlockCoroutine);
-            collisionBlockCoroutine = null;
-        }
-        isMove = false;
+        ResetCoroutine();
+        gameResult = false;
+        isMove     = false;
         
         mapSr  = _mapSr;
         arrow.gameObject.SetActive(false);
@@ -90,12 +104,20 @@ public class Player_Controller : MonoBehaviour{
     }
 
     private void OnMouseUp(){
+        if (gameResult) return;
+        
         if (angleCoroutine != null){
             StopCoroutine(angleCoroutine);
             angleCoroutine = null;
         }
+
+        if (movePlayerCoroutine != null){
+            StopCoroutine(movePlayerCoroutine);
+            movePlayerCoroutine = null;
+        }
+        
         arrow.gameObject.SetActive(false);
-        StartCoroutine(CoMovePlayer());
+        movePlayerCoroutine = StartCoroutine(CoMovePlayer());
     }
 
     IEnumerator CoMovePlayer(){
@@ -186,6 +208,7 @@ public class Player_Controller : MonoBehaviour{
                     case BlockType.Circle:{
                         if (CircleAndCircleCollision(sr.bounds, transform.position, 
                                                      block.controller.blockSr.bounds, block.gameObject.transform.position)){
+                            ResetCoroutine();
                             GameManager.OnCollisionBlockEvent();
                             yield break;
                         }
@@ -227,7 +250,7 @@ public class Player_Controller : MonoBehaviour{
     }
 
     private void OnMouseDown(){
-        if (isMove) return;
+        if (isMove || gameResult) return;
         if (angleCoroutine != null){
             StopCoroutine(angleCoroutine);
             angleCoroutine = null;
