@@ -58,7 +58,6 @@ public class GameRule : MonoBehaviour{
     }
 
     private void OnCreateCoinRequest(){
-        SetCoin();
     }
 
     private void OnBeginEnterGame(){
@@ -150,7 +149,7 @@ public class GameRule : MonoBehaviour{
         coin.gameObject.transform.position = new Vector3(Random.Range(coin.min.x, coin.max.x), Random.Range(coin.min.y, coin.max.y));;
         coin.gameObject.SetActive(true);
 
-        while (player.controller.CoinCollision(coin)){
+        while (player.controller.CreateCoinCollision(coin)){
             coin.gameObject.transform.position = new Vector3(Random.Range(coin.min.x, coin.max.x), Random.Range(coin.min.y, coin.max.y));
             await Task.Delay(1);
         }
@@ -162,7 +161,7 @@ public class GameRule : MonoBehaviour{
         coin.gameObject.SetActive(false);
         score += 1;
         NextPattern();
-        //SetCoin();
+        SetCoin();
     }
 
     private void OnCollisionBlock(){

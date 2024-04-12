@@ -19,6 +19,9 @@ public class Player_Controller : MonoBehaviour{
     private Coroutine angleCoroutine;
     private Coroutine collisionBlockCoroutine;
 
+    private Vector3 dirVector;
+    public Vector3 DirVector => dirVector;
+
     private void OnEnable(){
         GameManager.SetBlock   += SetBlock;
         GameManager.GameResult += GameResult;
@@ -92,7 +95,7 @@ public class Player_Controller : MonoBehaviour{
         var targetAngle = arrow.rotation.eulerAngles.z;
         targetAngle = isLeft ? fixedAngle + targetAngle : fixedAngle - targetAngle;
         var speed = isLeft ? moveSpeed : moveSpeed * -1f;
-        var dirVector = new Vector3(Mathf.Cos(Mathf.Deg2Rad * targetAngle) * speed,
+        dirVector = new Vector3(Mathf.Cos(Mathf.Deg2Rad * targetAngle) * speed,
                                     Mathf.Sin(Mathf.Deg2Rad * targetAngle) * moveSpeed, 0);
 
         var mapBounds    = mapSr.bounds;
@@ -191,9 +194,7 @@ public class Player_Controller : MonoBehaviour{
     }
 
     private bool CircleAndCircleCollision(Bounds lbounds, Vector3 lpos, Bounds rbounds, Vector3 rpos){
-        var distance  = (lpos - rpos).sqrMagnitude;
-        var sumRadius = lbounds.size.x * 0.5f + rbounds.size.x * 0.5f;
-        if (distance < sumRadius * sumRadius){
+        if (Vector3.Distance(lpos, rpos) < lbounds.size.x * 0.5f + rbounds.size.x * 0.5f){
             return true;
         }
         return false;
@@ -201,9 +202,21 @@ public class Player_Controller : MonoBehaviour{
 
     public bool CoinCollision(Runtime_Coin _coin){
         if (_coin == null) return false;
-        
         return CircleAndCircleCollision(sr.bounds, transform.position,
                                         _coin.sr.bounds, _coin.gameObject.transform.position);
+    }
+
+    public bool CreateCoinCollision(Runtime_Coin _coin){
+        if (_coin == null) return false;
+        var tr       = transform;
+        var position = tr.position;
+        var coinPos  = _coin.gameObject.transform.position;
+        var vVecotr  = position + (DirVector.normalized * Vector3.Distance(position, coinPos));
+            
+        return CircleAndCircleCollision(sr.bounds, position,
+                                        _coin.sr.bounds, coinPos) ||
+               CircleAndCircleCollision(sr.bounds, vVecotr,
+                                        _coin.sr.bounds, coinPos);
     }
 
     private void OnMouseDown(){
