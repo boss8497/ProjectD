@@ -33,7 +33,7 @@ public class Player_Controller : MonoBehaviour{
         GameManager.GameResult -= GameResult;
     }
 
-    private void GameResult(bool arg1, int arg2){
+    private void GameResult(GameResult result){
         StopAllCoroutines();
     }
 
@@ -53,7 +53,17 @@ public class Player_Controller : MonoBehaviour{
     }
 
     public void Initialize(Direction dir, SpriteRenderer _mapSr){
-        mapSr = _mapSr;
+        if (angleCoroutine != null){
+            StopCoroutine(angleCoroutine);
+            angleCoroutine = null;
+        }
+        if (collisionBlockCoroutine != null){
+            StopCoroutine(collisionBlockCoroutine);
+            collisionBlockCoroutine = null;
+        }
+        isMove = false;
+        
+        mapSr  = _mapSr;
         arrow.gameObject.SetActive(false);
         var tr = transform;
         tr.position = Vector3.zero;
@@ -167,9 +177,6 @@ public class Player_Controller : MonoBehaviour{
         }
         tr.position = resultPos;
         isMove      = false;
-        if (coin == null){
-            GameManager.OnCreateCoinRequestEvent();
-        }
     }
     
     IEnumerator CoCollisionBlock(){

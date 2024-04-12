@@ -27,6 +27,16 @@ public partial class GameManager : MonoBehaviour{
         OnEndEnterGame?.Invoke();
     }
     
+    public static event System.Action OnReStartGame;
+    public static void OnReStartGameEvent(){
+        OnReStartGame?.Invoke();
+    }
+    
+    public static event System.Action OnReStartGameEnd;
+    public static void OnReStartGameEndEvent(){
+        OnReStartGameEnd?.Invoke();
+    }
+    
     
     public static event System.Action<Transform> PlayerMove;
     public static void PlayerMoveEvent(Transform tr){
@@ -48,15 +58,15 @@ public partial class GameManager : MonoBehaviour{
         OnCollisionCoin?.Invoke();
     }
 
-    public static event System.Action<bool, int> GameResult;
-    public static void GameResultEvent(bool isWin, int score){
-        GameResult?.Invoke(isWin, score);
+    public static event System.Action<GameResult> GameResult;
+    public static void GameResultEvent(GameResult result){
+        GameResult?.Invoke(result);
     }
     
     
-    public static event System.Action OnCreateCoinRequest;
-    public static void OnCreateCoinRequestEvent(){
-        OnCreateCoinRequest?.Invoke();
+    public static event System.Action<int> SetScore;
+    public static void SetScoreEvent(int score){
+        SetScore?.Invoke(score);
     }
     
 }

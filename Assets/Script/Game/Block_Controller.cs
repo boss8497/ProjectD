@@ -21,7 +21,7 @@ public class Block_Controller : MonoBehaviour{
         GameManager.GameResult -= GameResult;
     }
 
-    private void GameResult(bool arg1, int arg2){
+    private void GameResult(GameResult result){
         StopAllCoroutines();
     }
 

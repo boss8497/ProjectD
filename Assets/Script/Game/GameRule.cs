@@ -30,6 +30,22 @@ public class Runtime_Player{
     public Player_Controller controller;
 }
 
+public class GameResult{
+    public bool isWin;
+    public int  score;
+
+    public void Reset(){
+        score = 0;
+        isWin = false;
+    }
+
+    public void Set(int _score, bool _isWin){
+        Reset();
+        score = _score;
+        isWin = _isWin;
+    }
+}
+
 public class GameRule : MonoBehaviour{
     public int            level;
     public GameObject     map;
@@ -42,26 +58,28 @@ public class GameRule : MonoBehaviour{
     private List<Runtime_Pattern> runtime_patterns;
     private SpriteRenderer        mapSr;
     private Runtime_Pattern       currentPattern;
+    private GameResult            gameResult;
 
     private void Awake(){
-        GameManager.OnBeginEnterGame    += OnBeginEnterGame;
-        GameManager.OnCollisionBlock    += OnCollisionBlock;
-        GameManager.OnCollisionCoin     += OnCollisionCoin;
-        GameManager.OnCreateCoinRequest += OnCreateCoinRequest;
+        GameManager.OnBeginEnterGame += OnBeginEnterGame;
+        GameManager.OnCollisionBlock += OnCollisionBlock;
+        GameManager.OnCollisionCoin  += OnCollisionCoin;
+        GameManager.OnReStartGame    += OnReStartGame;
     }
 
     private void OnDestroy(){
-        GameManager.OnBeginEnterGame    -= OnBeginEnterGame;
-        GameManager.OnCollisionBlock    -= OnCollisionBlock;
-        GameManager.OnCollisionCoin     -= OnCollisionCoin;
-        GameManager.OnCreateCoinRequest -= OnCreateCoinRequest;
-    }
-
-    private void OnCreateCoinRequest(){
+        GameManager.OnBeginEnterGame -= OnBeginEnterGame;
+        GameManager.OnCollisionBlock -= OnCollisionBlock;
+        GameManager.OnCollisionCoin  -= OnCollisionCoin;
+        GameManager.OnReStartGame    -= OnReStartGame;
     }
 
     private void OnBeginEnterGame(){
         Initialize();
+    }
+    
+    private void OnReStartGame(){
+        ReStart();
     }
 
     public async void Initialize(){
@@ -78,6 +96,15 @@ public class GameRule : MonoBehaviour{
         LoadCoint();
         NextPattern();
         await SetCoin();
+    }
+
+    public void ReStart(){
+        score = 0;
+        player.controller.Initialize(Direction.Left, mapSr);
+        NextPattern();
+        SetCoin();
+        GameManager.SetScoreEvent(score);
+        GameManager.OnReStartGameEndEvent();
     }
 
     public void Release(){
@@ -162,17 +189,21 @@ public class GameRule : MonoBehaviour{
         score += 1;
         NextPattern();
         SetCoin();
+        GameManager.SetScoreEvent(score);
     }
 
     private void OnCollisionBlock(){
-        //Fail();
+        Fail();
     }
 
     public void Win(){
     }
 
     public void Fail(){
-        Debug.Log($"Fail");
-        GameManager.GameResultEvent(false, 0);
+        if (gameResult == null){
+            gameResult = new GameResult();
+        }
+        gameResult.Set(score, false);
+        GameManager.GameResultEvent(gameResult);
     }
 }
