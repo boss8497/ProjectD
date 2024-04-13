@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: b8d91e7e211941347b53370ae155e705
   m_currentHash:
     serializedVersion: 2
-    Hash: 54cc8b670a693708d67c8c2653906723
+    Hash: f35bf620c31c4914590ac44dc999d5af
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 1
   m_BundleLocalCatalog: 0
@@ -58,7 +58,7 @@ MonoBehaviour:
       m_ProfileName: Default
       m_Values:
       - m_Id: a04c3eb1db5a0b84797e403e8c878ee7
-        m_Value: http://125.133.16.78:10000/ProjectD/[UnityEditor.EditorUserBuildSettings.activeBuildTarget]
+        m_Value: 
       - m_Id: 938c2f842b534784f84b9a654d7991a9
         m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
       - m_Id: 1e9c3306cc2f8ff4b8bd17aa3e5e16ef
