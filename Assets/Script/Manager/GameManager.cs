@@ -40,7 +40,9 @@ public partial class GameManager : MonoBehaviour{
 
         GameManager.GameInitializeProgressEvent(1.0f);
 
-        GameManager.BeginEnterGame();
+        var stage = StageDataManager.Instance.GetStageInfo(1);
+        GameManager.BeginEnterGame(stage);
+        GameManager.ExceptionMessageEvent("Loading End");
     }
 
     private async Task Initialize_Addressable(){

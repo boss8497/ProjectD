@@ -61,28 +61,22 @@ public class GameRule : MonoBehaviour{
     private GameResult            gameResult;
 
     private void Awake(){
-        GameManager.OnBeginEnterGame += OnBeginEnterGame;
         GameManager.OnCollisionBlock += OnCollisionBlock;
         GameManager.OnCollisionCoin  += OnCollisionCoin;
         GameManager.OnReStartGame    += OnReStartGame;
     }
 
     private void OnDestroy(){
-        GameManager.OnBeginEnterGame -= OnBeginEnterGame;
         GameManager.OnCollisionBlock -= OnCollisionBlock;
         GameManager.OnCollisionCoin  -= OnCollisionCoin;
         GameManager.OnReStartGame    -= OnReStartGame;
-    }
-
-    private void OnBeginEnterGame(){
-        Initialize();
     }
     
     private void OnReStartGame(){
         ReStart();
     }
 
-    public async void Initialize(){
+    public async Task Initialize(){
         score     = 0;
         stageInfo = StageDataManager.Instance.GetStageInfo(level);
         if (stageInfo == null){

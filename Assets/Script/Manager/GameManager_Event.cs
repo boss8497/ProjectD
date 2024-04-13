@@ -18,9 +18,9 @@ public partial class GameManager : MonoBehaviour{
         GameInitializeProgress?.Invoke(progress);
     }
     
-    public static event System.Action OnBeginEnterGame;
-    public static void BeginEnterGame(){
-        OnBeginEnterGame?.Invoke();
+    public static event System.Action<StageInfo> OnBeginEnterGame;
+    public static void BeginEnterGame(StageInfo stageInfo){
+        OnBeginEnterGame?.Invoke(stageInfo);
     }
     public static event System.Action OnEndEnterGame;
     public static void EndEnterGameEvent(){
@@ -69,4 +69,9 @@ public partial class GameManager : MonoBehaviour{
         SetScore?.Invoke(score);
     }
     
+    
+    public static event System.Action<string> ExceptionMessage;
+    public static void ExceptionMessageEvent(string message){
+        ExceptionMessage?.Invoke(message);
+    }
 }

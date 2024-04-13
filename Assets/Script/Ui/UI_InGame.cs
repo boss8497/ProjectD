@@ -13,10 +13,13 @@ public class UI_InGame : MonoBehaviour{
 
     public TextMeshProUGUI scoreText;
     public string          scoreTextFormat;
+    
+    public TextMeshProUGUI exceptionText;
     private void Awake(){
         GameManager.OnBeginEnterGame += OnBeginEnterGame;
         GameManager.SetScore         += SetScore;
         GameManager.GameResult       += OnGameResult;
+        GameManager.ExceptionMessage += ExceptionMessage;
         Off.Invoke();
     }
 
@@ -24,6 +27,11 @@ public class UI_InGame : MonoBehaviour{
         GameManager.OnBeginEnterGame -= OnBeginEnterGame;
         GameManager.SetScore         -= SetScore;
         GameManager.GameResult       -= OnGameResult;
+        GameManager.ExceptionMessage -= ExceptionMessage;
+    }
+
+    private void ExceptionMessage(string obj){
+        exceptionText.text += $"\n{obj}";
     }
 
     private void OnGameResult(GameResult result){
@@ -36,7 +44,7 @@ public class UI_InGame : MonoBehaviour{
         }
     }
 
-    private void OnBeginEnterGame(){
+    private void OnBeginEnterGame(StageInfo stageInfo){
         if (scoreText != null){
             scoreText.text = string.Format(scoreTextFormat, 0);
         }
