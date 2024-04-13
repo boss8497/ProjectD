@@ -45,7 +45,7 @@ public class AddressableManager{
         var result = handle.Result;
         callback?.Invoke(result);
 
-        Addressables.Release(handle);
+        //Addressables.Release(handle);
         return result;
     }
 

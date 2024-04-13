@@ -31,6 +31,9 @@ public class UI_InGame : MonoBehaviour{
     }
 
     private void ExceptionMessage(string obj){
+        if (exceptionText.text.Split('\n').Length > 10){
+            exceptionText.text = string.Empty;
+        }
         exceptionText.text += $"\n{obj}";
     }
 
