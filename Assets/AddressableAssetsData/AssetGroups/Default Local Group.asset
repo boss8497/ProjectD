@@ -27,6 +27,31 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ef2c665334bb8844698e3cb94d96b45f
+    m_Address: Assets/Prefab/Circle.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 914660c74906bc74fbf4e8ab8716d87e
+    m_Address: Assets/Prefab/Coin.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4257fd49a8f33ad4b824a1d67a3938f4
+    m_Address: Assets/Prefab/Player.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8715b038ad8eb5247b04f76ffcd36d21
+    m_Address: Assets/Data/ObjectPoolingDatas.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f6288112b98cf2243a9a43acd5d5078d
+    m_Address: Assets/Data/StageDatas.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 955ca7a34c13fc34abd57916f7d4c133, type: 2}
   m_SchemaSet:
