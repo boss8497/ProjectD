@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Block_Controller : MonoBehaviour{
@@ -44,42 +45,31 @@ public class Block_Controller : MonoBehaviour{
         
         var mapBounds   = mapSr.bounds;
         var blockBounds = blockSr.bounds;
-        
-        switch (blockinfo.direction){
+        var firstDir    = blockinfo.direction.First();
+        switch (firstDir){
             case Direction.Top:
                 startPosition.y = mapBounds.size.y / 2 - blockBounds.size.y / 2;
                 endPosition.y   = startPosition.y;
+                startPosition.x = blockBounds.size.x / 2 - mapBounds.size.x   / 2;
+                endPosition.x   = mapBounds.size.x   / 2 - blockBounds.size.x / 2;
                 break;
             case Direction.Bottom:
                 startPosition.y = blockBounds.size.y / 2 - mapBounds.size.y / 2;
                 endPosition.y   = startPosition.y;
+                startPosition.x = mapBounds.size.x   / 2 - blockBounds.size.x / 2;
+                endPosition.x   = blockBounds.size.x / 2 - mapBounds.size.x   / 2;
                 break;
             case Direction.Left:
                 startPosition.x = blockBounds.size.x / 2 - mapBounds.size.x / 2;
                 endPosition.x   = startPosition.x;
+                startPosition.y = mapBounds.size.y   / 2 - blockBounds.size.y / 2;
+                endPosition.y   = blockBounds.size.y / 2 - mapBounds.size.y   / 2;
                 break;
             case Direction.Right:
                 startPosition.x = mapBounds.size.x / 2 - blockBounds.size.x / 2;
                 endPosition.x   = startPosition.x;
-                break;
-        }
-
-        switch (blockinfo.moveDirection){
-            case MoveDirection.TopToBottom:
-                startPosition.y         = mapBounds.size.y   / 2 - blockBounds.size.y / 2;
-                endPosition.y = blockBounds.size.y / 2 - mapBounds.size.y   / 2;
-                break;
-            case MoveDirection.BottomToTop:
-                startPosition.y         = blockBounds.size.y / 2 - mapBounds.size.y   / 2;
-                endPosition.y = mapBounds.size.y   / 2 - blockBounds.size.y / 2;
-                break;
-            case MoveDirection.LeftToRight:
-                startPosition.x         = blockBounds.size.x / 2 - mapBounds.size.x   / 2;
-                endPosition.x = mapBounds.size.x   / 2 - blockBounds.size.x / 2;
-                break;
-            case MoveDirection.RightToLeft:
-                startPosition.x         = mapBounds.size.x   / 2 - blockBounds.size.x / 2;
-                endPosition.x = blockBounds.size.x / 2 - mapBounds.size.x   / 2;
+                startPosition.y = blockBounds.size.y / 2 - mapBounds.size.y   / 2;
+                endPosition.y   = mapBounds.size.y   / 2 - blockBounds.size.y / 2;
                 break;
         }
 

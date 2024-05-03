@@ -9,14 +9,6 @@ public enum Direction{
     Left,
     Right,
 }
-
-public enum MoveDirection{
-    TopToBottom,
-    BottomToTop,
-    LeftToRight,
-    RightToLeft,
-}
-
 public enum BlockType{
     Circle,
     Rect
@@ -24,10 +16,9 @@ public enum BlockType{
 
 [Serializable]
 public class Block{
-    public PoolingKey    poolingKey;
-    public BlockType     type;
-    public Direction     direction;
-    public MoveDirection moveDirection;
+    public PoolingKey     poolingKey;
+    public BlockType      type;
+    public List<Direction> direction;
     public float         size;
     public float         speed;
 }
