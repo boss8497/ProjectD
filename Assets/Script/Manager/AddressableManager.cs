@@ -26,13 +26,13 @@ public class AddressableManager{
 
     private void Initialize_Completed(AsyncOperationHandle<IResourceLocator> obj){
         if (obj.IsDone == false)
-            throw new Exception($"Addressable Initialize Failed");
+            throw new Exception($"Addressable Init Failed");
         initialized = true;
     }
 
     public async Task<T> LoadAsset<T>(string path, Action<T> callback = null){
         if (!Valid()){
-            throw new Exception("Addressable is not Initialize");
+            throw new Exception("Addressable is not Init");
         }
 
         var handle = Addressables.LoadAssetAsync<T>(path);

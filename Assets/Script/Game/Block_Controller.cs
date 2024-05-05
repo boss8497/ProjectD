@@ -11,8 +11,9 @@ public class Block_Controller : MonoBehaviour{
     private Transform      map;
     private SpriteRenderer mapSr;
 
-    private Vector3 startPosition;
-    private Vector3 endPosition;
+    private Vector3   startPosition;
+    private Vector3   endPosition;
+    private Direction currentDire;
 
     private void OnEnable(){
         GameManager.GameResult += GameResult;
@@ -27,59 +28,88 @@ public class Block_Controller : MonoBehaviour{
     }
 
 
-    public void SetData(Block _block, Transform _map, SpriteRenderer _mapSr){
+    public void Init(Block _block, Transform _map, SpriteRenderer _mapSr){
         blockinfo = _block;
         map       = _map;
         mapSr     = _mapSr;
-        SetPosition();
+        InitPosition();
         StopMove();
     }
 
-    private void SetPosition(){
+    public void InitPosition(){
+        var (start, end)   = GetPosition(0);
+        startPosition      = start;
+        transform.position = startPosition;
+        endPosition        = end;
+    }
+
+    private (Vector3 start, Vector3 end) GetPosition(int score = 0){
         startPosition = Vector3.zero;
         endPosition   = Vector3.zero;
         
         var tr = transform;
-        tr.position = Vector3.zero;
         tr.localScale = new Vector3(blockinfo.size, blockinfo.size, tr.localScale.z);
         
         var mapBounds   = mapSr.bounds;
         var blockBounds = blockSr.bounds;
-        var firstDir    = blockinfo.direction.First();
-        switch (firstDir){
+        currentDire = blockinfo.direction[score % blockinfo.direction.Count];
+        switch (currentDire){
             case Direction.Top:
                 startPosition.y = mapBounds.size.y / 2 - blockBounds.size.y / 2;
-                endPosition.y   = startPosition.y;
-                startPosition.x = blockBounds.size.x / 2 - mapBounds.size.x   / 2;
-                endPosition.x   = mapBounds.size.x   / 2 - blockBounds.size.x / 2;
-                break;
-            case Direction.Bottom:
-                startPosition.y = blockBounds.size.y / 2 - mapBounds.size.y / 2;
                 endPosition.y   = startPosition.y;
                 startPosition.x = mapBounds.size.x   / 2 - blockBounds.size.x / 2;
                 endPosition.x   = blockBounds.size.x / 2 - mapBounds.size.x   / 2;
                 break;
+            case Direction.Bottom:
+                startPosition.y = blockBounds.size.y / 2 - mapBounds.size.y / 2;
+                endPosition.y   = startPosition.y;
+                startPosition.x = blockBounds.size.x / 2 - mapBounds.size.x   / 2;
+                endPosition.x   = mapBounds.size.x   / 2 - blockBounds.size.x / 2;
+                break;
             case Direction.Left:
                 startPosition.x = blockBounds.size.x / 2 - mapBounds.size.x / 2;
-                endPosition.x   = startPosition.x;
-                startPosition.y = mapBounds.size.y   / 2 - blockBounds.size.y / 2;
-                endPosition.y   = blockBounds.size.y / 2 - mapBounds.size.y   / 2;
-                break;
-            case Direction.Right:
-                startPosition.x = mapBounds.size.x / 2 - blockBounds.size.x / 2;
                 endPosition.x   = startPosition.x;
                 startPosition.y = blockBounds.size.y / 2 - mapBounds.size.y   / 2;
                 endPosition.y   = mapBounds.size.y   / 2 - blockBounds.size.y / 2;
                 break;
+            case Direction.Right:
+                startPosition.x = mapBounds.size.x / 2 - blockBounds.size.x / 2;
+                endPosition.x   = startPosition.x;
+                startPosition.y = mapBounds.size.y   / 2 - blockBounds.size.y / 2;
+                endPosition.y   = blockBounds.size.y / 2 - mapBounds.size.y   / 2;
+                break;
         }
 
-        transform.position = startPosition;
+        return (startPosition, endPosition);
     }
 
     public void StopMove(){
         StopAllCoroutines();
-        gameObject.SetActive(false);
-        transform.position = startPosition;
+    }
+
+    public void MoveToNextPosition(int score){
+        var (start, end)   = GetPosition(score);
+        startPosition      = start;
+        endPosition        = end;
+        StartCoroutine(CoMoveToStartPosition());
+    }
+
+    IEnumerator CoMoveToStartPosition(){
+        var tr        = transform;
+        var dir       =  startPosition - tr.position;
+        var dirNormal = dir.normalized;
+
+        while (true){
+            tr.position += dirNormal * (blockinfo.speed * 3 * Time.deltaTime);
+
+            if (Vector3.Distance(tr.position, startPosition) <= 0.1f){
+                tr.position = startPosition;
+                break;
+            }
+
+            yield return null;
+        }
+        StartCoroutine(CoMove(blockinfo.speed));
     }
 
     public void StartMove(){

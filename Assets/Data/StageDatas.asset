@@ -22,7 +22,6 @@ MonoBehaviour:
         direction: 0000000003000000
         size: 0.5
         speed: 3
-    - blocks:
       - poolingKey: 1
         type: 0
         direction: 0100000002000000

@@ -57,7 +57,6 @@ public class GameRule : MonoBehaviour{
     private StageInfo             stageInfo;
     private List<Runtime_Pattern> runtime_patterns;
     private SpriteRenderer        mapSr;
-    private Runtime_Pattern       currentPattern;
     private GameResult            gameResult;
 
     private void Awake(){
@@ -130,7 +129,7 @@ public class GameRule : MonoBehaviour{
         rBlock.blockinfo  = _block;
         rBlock.gameObject = ObjectPoolingManager.Instance.Pop(rBlock.blockinfo.poolingKey, content);
         rBlock.controller = rBlock.gameObject.GetComponent<Block_Controller>();
-        rBlock.controller.SetData(_block, map.transform, mapSr);
+        rBlock.controller.Init(_block, map.transform, mapSr);
         return rBlock;
     }
 
@@ -146,21 +145,22 @@ public class GameRule : MonoBehaviour{
     }
 
 
-    private void NextPattern(){
-        if (currentPattern != null){
-            foreach (var block in currentPattern.blocks){
-                block.controller.StopMove();
-            }
-        }
+    private void NextPattern(bool initPos = false){
+        var currentPattern = runtime_patterns.FirstOrDefault();
+        if (currentPattern == null) return;
         
-        currentPattern = runtime_patterns[score % runtime_patterns.Count];
-        if (currentPattern == null){
-            Debug.LogError("Pattern Set Error");
-            return;
+        foreach (var block in currentPattern.blocks){
+            block.controller.StopMove();
+        }
+
+        if (initPos){
+            foreach (var block in currentPattern.blocks){
+                block.controller.InitPosition();
+            }
         }
 
         foreach (var block in currentPattern.blocks){
-            block.controller.StartMove();
+            block.controller.MoveToNextPosition(score);
         }
 
         GameManager.SetBlockEvent(currentPattern.blocks);
