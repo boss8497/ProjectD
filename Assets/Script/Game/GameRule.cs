@@ -85,17 +85,17 @@ public class GameRule : MonoBehaviour{
         mapSr = map.GetComponent<SpriteRenderer>();
 
         LoadPlayer();
-        LoadPattern();
+        LoadPattern(stageInfo);
         LoadCoint();
-        NextPattern();
+        NextPattern(true);
         await SetCoin();
     }
 
-    public void ReStart(){
+    private async void ReStart(){
         score = 0;
         player.controller.Initialize(Direction.Left, mapSr);
-        NextPattern();
-        SetCoin();
+        NextPattern(true);
+        await SetCoin();
         GameManager.SetScoreEvent(score);
         GameManager.OnReStartGameEndEvent();
     }
@@ -111,25 +111,25 @@ public class GameRule : MonoBehaviour{
         player.controller.Initialize(Direction.Left, mapSr);
     }
 
-    private void LoadPattern(){
+    private void LoadPattern(StageInfo info){
         runtime_patterns = new List<Runtime_Pattern>();
         foreach (var pattern in stageInfo.patterns){
             var rpattern = new Runtime_Pattern();
             rpattern.blocks = new List<Runtime_Block>();
             foreach (var block in pattern.blocks){
-                rpattern.blocks.Add(LoadBlock(block));
+                rpattern.blocks.Add(LoadBlock(block, info));
             }
 
             runtime_patterns.Add(rpattern);
         }
     }
 
-    private Runtime_Block LoadBlock(Block _block){
+    private Runtime_Block LoadBlock(Block _block, StageInfo info){
         var rBlock = new Runtime_Block();
         rBlock.blockinfo  = _block;
         rBlock.gameObject = ObjectPoolingManager.Instance.Pop(rBlock.blockinfo.poolingKey, content);
         rBlock.controller = rBlock.gameObject.GetComponent<Block_Controller>();
-        rBlock.controller.Init(_block, map.transform, mapSr);
+        rBlock.controller.Init(_block, map.transform, mapSr, info);
         return rBlock;
     }
 
@@ -149,18 +149,21 @@ public class GameRule : MonoBehaviour{
         var currentPattern = runtime_patterns.FirstOrDefault();
         if (currentPattern == null) return;
         
-        foreach (var block in currentPattern.blocks){
-            block.controller.StopMove();
-        }
+        // foreach (var block in currentPattern.blocks){
+        //     block.controller.StopMove();
+        // }
 
         if (initPos){
             foreach (var block in currentPattern.blocks){
                 block.controller.InitPosition();
+                block.controller.StartMove();
             }
         }
 
-        foreach (var block in currentPattern.blocks){
-            block.controller.MoveToNextPosition(score);
+        if(initPos == false){
+            foreach (var block in currentPattern.blocks){
+                block.controller.MoveToNextPosition(score);
+            }
         }
 
         GameManager.SetBlockEvent(currentPattern.blocks);

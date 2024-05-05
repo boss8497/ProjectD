@@ -6,6 +6,7 @@ using UnityEngine;
 [Serializable]
 public class StageInfo{
     public int       level;
+    public int       patternRate;
     public string    stagePrefabPath;
     public Pattern[] patterns;
 }

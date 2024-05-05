@@ -10,10 +10,11 @@ public class Block_Controller : MonoBehaviour{
     private Block          blockinfo;
     private Transform      map;
     private SpriteRenderer mapSr;
+    private StageInfo      stageInfo;
 
     private Vector3   startPosition;
     private Vector3   endPosition;
-    private Direction currentDire;
+    private Direction currentDir;
 
     private void OnEnable(){
         GameManager.GameResult += GameResult;
@@ -28,22 +29,27 @@ public class Block_Controller : MonoBehaviour{
     }
 
 
-    public void Init(Block _block, Transform _map, SpriteRenderer _mapSr){
+    public void Init(Block _block, Transform _map, SpriteRenderer _mapSr, StageInfo _stageInfo){
         blockinfo = _block;
         map       = _map;
         mapSr     = _mapSr;
+        stageInfo = _stageInfo;
         InitPosition();
         StopMove();
     }
 
     public void InitPosition(){
-        var (start, end)   = GetPosition(0);
+        var (start, end)   = GetPosition(GetDirection(0));
         startPosition      = start;
         transform.position = startPosition;
         endPosition        = end;
     }
 
-    private (Vector3 start, Vector3 end) GetPosition(int score = 0){
+    private Direction GetDirection(int score = 0){
+        return blockinfo.direction[(score / stageInfo.patternRate) % blockinfo.direction.Count];
+    }
+
+    private (Vector3 start, Vector3 end) GetPosition(Direction dir){
         startPosition = Vector3.zero;
         endPosition   = Vector3.zero;
         
@@ -52,8 +58,8 @@ public class Block_Controller : MonoBehaviour{
         
         var mapBounds   = mapSr.bounds;
         var blockBounds = blockSr.bounds;
-        currentDire = blockinfo.direction[score % blockinfo.direction.Count];
-        switch (currentDire){
+        currentDir = dir;
+        switch (currentDir){
             case Direction.Top:
                 startPosition.y = mapBounds.size.y / 2 - blockBounds.size.y / 2;
                 endPosition.y   = startPosition.y;
@@ -88,10 +94,15 @@ public class Block_Controller : MonoBehaviour{
     }
 
     public void MoveToNextPosition(int score){
-        var (start, end)   = GetPosition(score);
-        startPosition      = start;
-        endPosition        = end;
-        StartCoroutine(CoMoveToStartPosition());
+        var nextDir  = GetDirection(score);
+        var moveFlag = nextDir != currentDir;
+        var (start, end) = GetPosition(nextDir);
+        startPosition    = start;
+        endPosition      = end;
+        if(moveFlag){
+            StopAllCoroutines();
+            StartCoroutine(CoMoveToStartPosition());
+        }
     }
 
     IEnumerator CoMoveToStartPosition(){
