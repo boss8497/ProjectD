@@ -8,6 +8,7 @@ public class StageInfo{
     public int       level;
     public int       patternRate;
     public string    stagePrefabPath;
+    public Rect      coninPadding;
     public Pattern[] patterns;
 }
 

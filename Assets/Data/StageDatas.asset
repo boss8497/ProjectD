@@ -16,6 +16,12 @@ MonoBehaviour:
   - level: 1
     patternRate: 5
     stagePrefabPath: Assets/Prefab/Stage/Stage1.prefab
+    coninPadding:
+      serializedVersion: 2
+      x: 0.4
+      y: 0.4
+      width: 0
+      height: 0
     patterns:
     - blocks:
       - poolingKey: 1

@@ -138,20 +138,17 @@ public class GameRule : MonoBehaviour{
         coin.gameObject = ObjectPoolingManager.Instance.Pop(PoolingKey.Coin, content, false);
         coin.sr         = coin.gameObject.GetComponent<SpriteRenderer>();
 
+        var padding    = stageInfo.coninPadding;
         var mapBounds  = mapSr.bounds;
         var coinBounds = coin.sr.bounds;
-        coin.min = new Vector3(mapBounds.min.x + coinBounds.size.x * 0.5f, mapBounds.min.y + coinBounds.size.y * 0.5f);
-        coin.min = new Vector3(mapBounds.max.x - coinBounds.size.x * 0.5f, mapBounds.max.y - coinBounds.size.y * 0.5f);
+        coin.min = new Vector3(mapBounds.min.x + coinBounds.size.x * 0.5f + padding.x, mapBounds.min.y + coinBounds.size.y * 0.5f + padding.y);
+        coin.max = new Vector3(mapBounds.max.x - coinBounds.size.x * 0.5f - padding.x, mapBounds.max.y - coinBounds.size.y * 0.5f - padding.y);
     }
 
 
     private void NextPattern(bool initPos = false){
         var currentPattern = runtime_patterns.FirstOrDefault();
         if (currentPattern == null) return;
-        
-        // foreach (var block in currentPattern.blocks){
-        //     block.controller.StopMove();
-        // }
 
         if (initPos){
             foreach (var block in currentPattern.blocks){
