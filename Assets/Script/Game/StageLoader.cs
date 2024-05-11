@@ -23,7 +23,8 @@ public class StageLoader : MonoBehaviour{
 
     private async void InitializeStage(){
         if (currentStage != null){
-            ObjectPoolingManager.Push(currentStage);
+            currentGameRule.Release();
+            ObjectPoolingManager.Instance.Push(currentStage);
             currentStage = null;
         }
 

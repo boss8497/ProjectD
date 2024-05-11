@@ -82,18 +82,18 @@ public class ObjectPoolingManager : MonoBehaviour{
         return obj;
     }
     
-    public static void Push(GameObject obj){
+    public void Push(GameObject obj){
         if (obj == null) return;
         var poolObject = obj.GetComponent<PoolObject>();
         if (poolObject != null){
-            Instance.Push(poolObject.key, obj);
+            Instance.Push(obj, poolObject.key);
         }
         else{
-            GameObject.Destroy(obj);
+            Destroy(obj);
         }
     } 
 
-    private void Push(PoolingKey key, GameObject obj){
+    public void Push(GameObject obj, PoolingKey key){
         if (destroyObject) return;
         var tr = obj.transform;
         tr.parent        = content.transform;

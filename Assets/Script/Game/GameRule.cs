@@ -101,6 +101,14 @@ public class GameRule : MonoBehaviour{
     }
 
     public void Release(){
+        foreach (var pattern in runtime_patterns){
+            foreach (var block in pattern.blocks){
+                ObjectPoolingManager.Instance.Push(block.gameObject, block.blockinfo.poolingKey);
+            }
+        }
+        
+        ObjectPoolingManager.Instance.Push(player.gameObject, PoolingKey.Player);
+        ObjectPoolingManager.Instance.Push(coin.gameObject, PoolingKey.Coin);
     }
 
     private void LoadPlayer(){

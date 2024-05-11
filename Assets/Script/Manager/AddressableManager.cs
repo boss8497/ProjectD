@@ -1,5 +1,5 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -10,7 +10,8 @@ public class AddressableManager{
     public static   AddressableManager Instance;
     public readonly TimeSpan           TimeOut = new(TimeSpan.TicksPerSecond * 10);
 
-    private bool initialized = false;
+    private Dictionary<string, AsyncOperationHandle<object>> loadAssets;
+    private bool                                       initialized = false;
 
     public bool Valid(){
         if (!initialized){
@@ -18,6 +19,12 @@ public class AddressableManager{
         }
 
         return true;
+    }
+
+    public void Clear(){
+        foreach (var asset in loadAssets){
+            Addressables.Release(asset.Value);
+        }
     }
 
     public void Initialize(){
@@ -28,24 +35,29 @@ public class AddressableManager{
         if (obj.IsDone == false)
             throw new Exception($"Addressable Init Failed");
         initialized = true;
+        loadAssets  = new Dictionary<string, AsyncOperationHandle<object>>();
     }
 
-    public async Task<T> LoadAsset<T>(string path, Action<T> callback = null){
+    public async Task<T> LoadAsset<T>(string path, Action<T> callback = null) where T : class{
         if (!Valid()){
             throw new Exception("Addressable is not Init");
         }
 
-        var handle = Addressables.LoadAssetAsync<T>(path);
+        if (loadAssets.ContainsKey(path)){
+            return (T)loadAssets[path].Result;
+        }
+
+        var handle = Addressables.LoadAssetAsync<object>(path);
         await handle.Task;
 
         if (handle.Status == AsyncOperationStatus.Failed){
             throw new Exception("LoadAsset Failed");
         }
 
-        var result = handle.Result;
+        var result = (T)handle.Result;
         callback?.Invoke(result);
 
-        //Addressables.Release(handle);
+        loadAssets[path] = handle;
         return result;
     }
 
