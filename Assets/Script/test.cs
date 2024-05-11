@@ -4,13 +4,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class test : MonoBehaviour{
-    public GameObject circle;
+    public GameObject parent;
 
-    public void Start(){
-        var csr = circle.GetComponent<SpriteRenderer>();
-        var sr = GetComponent<SpriteRenderer>();
+    private List<GameObject> objects = new List<GameObject>();
+
+
+    public async void CreateLoadAssets(){
+        var obj = await AddressableManager.Instance.LoadAsset<GameObject>("Assets/Prefab/Circle.prefab");
+        var circle = Instantiate(obj, parent.transform);
+        circle.transform.localPosition = Vector3.zero;
+        objects.Add(circle);
     }
-    
-    
-    
+
+    public void Clear(){
+        foreach (var obj in objects){
+            Destroy(obj);
+        }
+    }
 }
