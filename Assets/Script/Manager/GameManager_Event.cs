@@ -74,4 +74,40 @@ public partial class GameManager : MonoBehaviour{
     public static void ExceptionMessageEvent(string message){
         ExceptionMessage?.Invoke(message);
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    ///////////////////cheat
+    public static event System.Action<float> ChangePlayerSize;
+    public static void ChangePlayerSizeEvent(float size){
+        ChangePlayerSize?.Invoke(size);
+    }
+    
+    public static event System.Action<float> ChangePlayerSpeed;
+    public static void ChangePlayerSpeedEvent(float speed){
+        ChangePlayerSpeed?.Invoke(speed);
+    }
+    
+    
+    public static event System.Action<float> ChangeEnemySize;
+    public static void ChangeEnemySizeEvent(float size){
+        ChangeEnemySize?.Invoke(size);
+    }
+    
+    public static event System.Action<float> ChangeEnemySpeed;
+    public static void ChangeEnemySpeedEvent(float speed){
+        ChangeEnemySpeed?.Invoke(speed);
+    }
+    
+    
+    public static event System.Action<float> ChangeCoinSize;
+    public static void ChangeCoinSizeEvent(float size){
+        ChangeCoinSize?.Invoke(size);
+    }
 }

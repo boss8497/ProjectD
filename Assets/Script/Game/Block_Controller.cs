@@ -53,8 +53,9 @@ public class Block_Controller : MonoBehaviour{
         startPosition = Vector3.zero;
         endPosition   = Vector3.zero;
         
-        var tr = transform;
-        tr.localScale = new Vector3(blockinfo.size, blockinfo.size, tr.localScale.z);
+        var tr   = transform;
+        var size = stageInfo.enemySize;
+        tr.localScale = new Vector3(size, size, tr.localScale.z);
         
         var mapBounds   = mapSr.bounds;
         var blockBounds = blockSr.bounds;
@@ -109,9 +110,10 @@ public class Block_Controller : MonoBehaviour{
         var tr        = transform;
         var dir       =  startPosition - tr.position;
         var dirNormal = dir.normalized;
+        var speed     = stageInfo.enemySpeed;
 
         while (true){
-            tr.position += dirNormal * (blockinfo.speed * 3 * Time.deltaTime);
+            tr.position += dirNormal * (speed * 3 * Time.deltaTime);
 
             if (Vector3.Distance(tr.position, startPosition) <= 0.1f){
                 tr.position = startPosition;
@@ -120,12 +122,12 @@ public class Block_Controller : MonoBehaviour{
 
             yield return null;
         }
-        StartCoroutine(CoMove(blockinfo.speed));
+        StartCoroutine(CoMove(speed));
     }
 
     public void StartMove(){
         gameObject.SetActive(true);
-        StartCoroutine(CoMove(blockinfo.speed));
+        StartCoroutine(CoMove(stageInfo.enemySpeed));
     }
 
     IEnumerator CoMove(float speed){

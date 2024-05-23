@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum Direction{
@@ -15,10 +16,11 @@ public enum BlockType{
 }
 
 [Serializable]
-public class Block{
-    public PoolingKey     poolingKey;
-    public BlockType      type;
+public class Block {
+    public PoolingKey      poolingKey;
+    public BlockType       type;
     public List<Direction> direction;
-    public float         size;
-    public float         speed;
+    public Block Clone(){
+        return new Block{ poolingKey = poolingKey, type = type, direction = direction.ToList() };
+    }
 }

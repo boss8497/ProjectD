@@ -31,8 +31,9 @@ public class Runtime_Player{
 }
 
 public class GameResult{
-    public bool isWin;
-    public int  score;
+    public bool      isWin;
+    public int       score;
+    public StageInfo stageinfo;
 
     public void Reset(){
         score = 0;
@@ -63,21 +64,62 @@ public class GameRule : MonoBehaviour{
         GameManager.OnCollisionBlock += OnCollisionBlock;
         GameManager.OnCollisionCoin  += OnCollisionCoin;
         GameManager.OnReStartGame    += OnReStartGame;
+        
+        
+        //cheat
+        GameManager.ChangeCoinSize    += ChangeCoinSize;
+        GameManager.ChangePlayerSize  += ChangePlayerSize;
+        GameManager.ChangePlayerSpeed += ChangePlayerSpeed;
+        GameManager.ChangeEnemySize   += ChangeEnemySize;
+        GameManager.ChangeEnemySpeed  += ChangeEnemySpeed;
     }
 
     private void OnDestroy(){
         GameManager.OnCollisionBlock -= OnCollisionBlock;
         GameManager.OnCollisionCoin  -= OnCollisionCoin;
         GameManager.OnReStartGame    -= OnReStartGame;
+        
+        
+        //cheat
+        GameManager.ChangeCoinSize    -= ChangeCoinSize;
+        GameManager.ChangePlayerSize  -= ChangePlayerSize;
+        GameManager.ChangePlayerSpeed -= ChangePlayerSpeed;
+        GameManager.ChangeEnemySize   -= ChangeEnemySize;
+        GameManager.ChangeEnemySpeed  -= ChangeEnemySpeed;
     }
-    
+
+    private void ChangeEnemySpeed(float speed){
+        if (stageInfo == null) return;
+        stageInfo.enemySpeed = speed;
+    }
+
+    private void ChangeEnemySize(float size){
+        if (stageInfo == null) return;
+        stageInfo.enemySize = size;
+    }
+
+    private void ChangePlayerSpeed(float speed){
+        if (stageInfo == null) return;
+        stageInfo.playerSpeed = speed;
+    }
+
+    private void ChangePlayerSize(float size){
+        if (stageInfo == null) return;
+        stageInfo.playerSize = size;
+    }
+
+    private void ChangeCoinSize(float size){
+        if (stageInfo == null) return;
+        stageInfo.coinSize = size;
+    }
+
     private void OnReStartGame(){
         ReStart();
     }
 
     public async Task Initialize(){
         score     = 0;
-        stageInfo = StageDataManager.Instance.GetStageInfo(level);
+        stageInfo = StageDataManager.Instance.GetStageInfo(level).Clone();
         if (stageInfo == null){
             Debug.LogError("not found Stage Info");
         }
@@ -92,8 +134,11 @@ public class GameRule : MonoBehaviour{
     }
 
     private async void ReStart(){
-        score = 0;
-        player.controller.Initialize(Direction.Left, mapSr);
+        Release();
+        
+        LoadPlayer();
+        LoadPattern(stageInfo);
+        LoadCoint();
         NextPattern(true);
         await SetCoin();
         GameManager.SetScoreEvent(score);
@@ -116,7 +161,7 @@ public class GameRule : MonoBehaviour{
         player.gameObject = ObjectPoolingManager.Instance.Pop(PoolingKey.Player, content);
         player.controller = player.gameObject.GetComponent<Player_Controller>();
         player.sr         = player.gameObject.GetComponent<SpriteRenderer>();
-        player.controller.Initialize(Direction.Left, mapSr);
+        player.controller.Initialize(Direction.Left, mapSr, stageInfo.playerSize, stageInfo.playerSpeed);
     }
 
     private void LoadPattern(StageInfo info){
@@ -142,11 +187,13 @@ public class GameRule : MonoBehaviour{
     }
 
     private void LoadCoint(){
-        coin            = new Runtime_Coin();
-        coin.gameObject = ObjectPoolingManager.Instance.Pop(PoolingKey.Coin, content, false);
-        coin.sr         = coin.gameObject.GetComponent<SpriteRenderer>();
+        coin                                    = new Runtime_Coin();
+        coin.gameObject                         = ObjectPoolingManager.Instance.Pop(PoolingKey.Coin, content, false);
+        var size = stageInfo.coinSize;
+        coin.gameObject.transform.localPosition = new Vector3(size, size, 0);
+        coin.sr                                 = coin.gameObject.GetComponent<SpriteRenderer>();
 
-        var padding    = stageInfo.coninPadding;
+        var padding    = stageInfo.coinPadding;
         var mapBounds  = mapSr.bounds;
         var coinBounds = coin.sr.bounds;
         coin.min = new Vector3(mapBounds.min.x + coinBounds.size.x * 0.5f + padding.x, mapBounds.min.y + coinBounds.size.y * 0.5f + padding.y);
@@ -206,6 +253,7 @@ public class GameRule : MonoBehaviour{
             gameResult = new GameResult();
         }
         gameResult.Set(score, false);
+        gameResult.stageinfo = stageInfo;
         GameManager.GameResultEvent(gameResult);
     }
 }

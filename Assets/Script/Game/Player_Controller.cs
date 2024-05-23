@@ -9,7 +9,7 @@ public class Player_Controller : MonoBehaviour{
     public float          fixedAngle = 90f;
     public float          angle;
     public float          angleRotateSpeed;
-    public float          moveSpeed;
+    private float          moveSpeed;
 
     private SpriteRenderer      mapSr;
     private List<Runtime_Block> blocks = new List<Runtime_Block>();
@@ -72,15 +72,17 @@ public class Player_Controller : MonoBehaviour{
         coin = _coin;
     }
 
-    public void Initialize(Direction dir, SpriteRenderer _mapSr){
+    public void Initialize(Direction dir, SpriteRenderer _mapSr, float _size, float _speed){
         ResetCoroutine();
         gameResult = false;
         isMove     = false;
-        
-        mapSr  = _mapSr;
+
+        moveSpeed = _speed;
+        mapSr     = _mapSr;
         arrow.gameObject.SetActive(false);
         var tr = transform;
-        tr.position = Vector3.zero;
+        tr.position   = Vector3.zero;
+        tr.localScale = new Vector3(_size, _size, 0);
         var mapBounds     = mapSr.bounds;
         var playerBounds  = sr.bounds;
         var startPosition = Vector3.zero;
