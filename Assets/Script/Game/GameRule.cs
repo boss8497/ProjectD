@@ -134,6 +134,7 @@ public class GameRule : MonoBehaviour{
     }
 
     private async void ReStart(){
+        score = 0;
         Release();
         
         LoadPlayer();
