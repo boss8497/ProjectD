@@ -31,7 +31,7 @@ MonoBehaviour:
     - blocks:
       - poolingKey: 1
         type: 0
-        direction: 0000000003000000
+        startDirection: 0
       - poolingKey: 1
         type: 0
-        direction: 0100000002000000
+        startDirection: 3

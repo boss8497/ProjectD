@@ -162,7 +162,7 @@ public class GameRule : MonoBehaviour{
         player.gameObject = ObjectPoolingManager.Instance.Pop(PoolingKey.Player, content);
         player.controller = player.gameObject.GetComponent<Player_Controller>();
         player.sr         = player.gameObject.GetComponent<SpriteRenderer>();
-        player.controller.Initialize(Direction.Left, mapSr, stageInfo.playerSize, stageInfo.playerSpeed);
+        player.controller.Initialize(mapSr, stageInfo.playerSize, stageInfo.playerSpeed);
     }
 
     private void LoadPattern(StageInfo info){

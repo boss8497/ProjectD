@@ -72,7 +72,7 @@ public class Player_Controller : MonoBehaviour{
         coin = _coin;
     }
 
-    public void Initialize(Direction dir, SpriteRenderer _mapSr, float _size, float _speed){
+    public void Initialize(SpriteRenderer _mapSr, float _size, float _speed){
         ResetCoroutine();
         gameResult = false;
         isMove     = false;
@@ -81,28 +81,25 @@ public class Player_Controller : MonoBehaviour{
         mapSr     = _mapSr;
         arrow.gameObject.SetActive(false);
         var tr = transform;
-        tr.position   = Vector3.zero;
         tr.localScale = new Vector3(_size, _size, 0);
         var mapBounds     = mapSr.bounds;
         var playerBounds  = sr.bounds;
-        var startPosition = Vector3.zero;
-
-        switch (dir){
-            case Direction.Top:
-                startPosition.y = mapBounds.size.y / 2 - playerBounds.size.y / 2;
-                break;
-            case Direction.Bottom:
-                startPosition.y = playerBounds.size.y / 2 - mapBounds.size.y / 2;
-                break;
-            case Direction.Left:
-                startPosition.x = playerBounds.size.x / 2 - mapBounds.size.x / 2;
-                break;
-            case Direction.Right:
-                startPosition.x = mapBounds.size.x / 2 - playerBounds.size.x / 2;
-                break;
-        }
-
-        tr.position = startPosition;
+        tr.position = new Vector3(playerBounds.size.x / 2 - mapBounds.size.x / 2, 0, 0);
+        
+        // switch (dir){
+        //     case Direction.Top:
+        //         startPosition.y = mapBounds.size.y / 2 - playerBounds.size.y / 2;
+        //         break;
+        //     case Direction.Bottom:
+        //         startPosition.y = playerBounds.size.y / 2 - mapBounds.size.y / 2;
+        //         break;
+        //     case Direction.Left:
+        //         startPosition.x = playerBounds.size.x / 2 - mapBounds.size.x / 2;
+        //         break;
+        //     case Direction.Right:
+        //         startPosition.x = mapBounds.size.x / 2 - playerBounds.size.x / 2;
+        //         break;
+        // }
     }
 
     private void OnMouseUp(){

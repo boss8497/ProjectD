@@ -4,6 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+public enum MoveDirection{
+    Horizontal = 0,
+    Vertical,
+}
+
 public class Block_Controller : MonoBehaviour{
     public SpriteRenderer blockSr;
 
@@ -12,9 +17,10 @@ public class Block_Controller : MonoBehaviour{
     private SpriteRenderer mapSr;
     private StageInfo      stageInfo;
 
-    private Vector3   startPosition;
-    private Vector3   endPosition;
-    private Direction currentDir;
+    private Direction     currentDir;
+    private MoveDirection moveDir;
+
+    private Vector3[] edgePos;
 
     private void OnEnable(){
         GameManager.GameResult += GameResult;
@@ -34,94 +40,84 @@ public class Block_Controller : MonoBehaviour{
         map       = _map;
         mapSr     = _mapSr;
         stageInfo = _stageInfo;
+        moveDir   = MoveDirection.Horizontal;
+        InitEdge();
         InitPosition();
         StopMove();
     }
 
     public void InitPosition(){
-        var (start, end)   = GetPosition(GetDirection(0));
-        startPosition      = start;
-        transform.position = startPosition;
-        endPosition        = end;
+        currentDir         = blockinfo.startDirection;
+        transform.position = edgePos[(int)currentDir];
     }
 
-    private Direction GetDirection(int score = 0){
-        return blockinfo.direction[(score / stageInfo.patternRate) % blockinfo.direction.Count];
-    }
-
-    private (Vector3 start, Vector3 end) GetPosition(Direction dir){
-        startPosition = Vector3.zero;
-        endPosition   = Vector3.zero;
-        
-        var tr   = transform;
-        var size = stageInfo.enemySize;
-        tr.localScale = new Vector3(size, size, tr.localScale.z);
-        
+    private void InitEdge(){
         var mapBounds   = mapSr.bounds;
         var blockBounds = blockSr.bounds;
-        currentDir = dir;
-        switch (currentDir){
-            case Direction.Top:
-                startPosition.y = mapBounds.size.y / 2 - blockBounds.size.y / 2;
-                endPosition.y   = startPosition.y;
-                startPosition.x = mapBounds.size.x   / 2 - blockBounds.size.x / 2;
-                endPosition.x   = blockBounds.size.x / 2 - mapBounds.size.x   / 2;
-                break;
-            case Direction.Bottom:
-                startPosition.y = blockBounds.size.y / 2 - mapBounds.size.y / 2;
-                endPosition.y   = startPosition.y;
-                startPosition.x = blockBounds.size.x / 2 - mapBounds.size.x   / 2;
-                endPosition.x   = mapBounds.size.x   / 2 - blockBounds.size.x / 2;
-                break;
-            case Direction.Left:
-                startPosition.x = blockBounds.size.x / 2 - mapBounds.size.x / 2;
-                endPosition.x   = startPosition.x;
-                startPosition.y = blockBounds.size.y / 2 - mapBounds.size.y   / 2;
-                endPosition.y   = mapBounds.size.y   / 2 - blockBounds.size.y / 2;
-                break;
-            case Direction.Right:
-                startPosition.x = mapBounds.size.x / 2 - blockBounds.size.x / 2;
-                endPosition.x   = startPosition.x;
-                startPosition.y = mapBounds.size.y   / 2 - blockBounds.size.y / 2;
-                endPosition.y   = blockBounds.size.y / 2 - mapBounds.size.y   / 2;
-                break;
-        }
+        edgePos = new Vector3[Enum.GetValues(typeof(Direction)).Length];
+        edgePos[(int)Direction.TopLeft] = new Vector3(mapBounds.size.x / 2 - blockBounds.size.x / 2,
+                                                      mapBounds.size.y / 2 - blockBounds.size.y / 2, 0);
+        edgePos[(int)Direction.TopRight] = new Vector3(blockBounds.size.x / 2 - mapBounds.size.x   / 2,
+                                                       mapBounds.size.y   / 2 - blockBounds.size.y / 2, 0);
 
-        return (startPosition, endPosition);
+        edgePos[(int)Direction.BottomLeft] = new Vector3(mapBounds.size.x   / 2 - blockBounds.size.x / 2,
+                                                         blockBounds.size.y / 2 - mapBounds.size.y   / 2, 0);
+        edgePos[(int)Direction.BottomRight] = new Vector3(blockBounds.size.x / 2 - mapBounds.size.x / 2,
+                                                          blockBounds.size.y / 2 - mapBounds.size.y / 2, 0);
     }
 
     public void StopMove(){
         StopAllCoroutines();
     }
 
+    private MoveDirection GetDirection(int score = 0){
+        return (MoveDirection)(score / stageInfo.patternRate % 2);
+    }
+
     public void MoveToNextPosition(int score){
-        var nextDir  = GetDirection(score);
-        var moveFlag = nextDir != currentDir;
-        var (start, end) = GetPosition(nextDir);
-        startPosition    = start;
-        endPosition      = end;
-        if(moveFlag){
+        var nextMoveDir = GetDirection(score);
+        var changeFlag  = moveDir != nextMoveDir;
+        if (changeFlag){
+            moveDir = nextMoveDir;
             StopAllCoroutines();
             StartCoroutine(CoMoveToStartPosition());
         }
     }
 
+    private (Direction, Vector3) GetNextPosition(){
+        var pos     = transform.position;
+        var minDis = float.MaxValue;
+        var dir    = Direction.BottomLeft;
+
+        for (var i = 0; i < edgePos.Length; ++i){
+            var dis = Mathf.Abs(Vector3.Distance(pos, edgePos[i]));
+            if (dis < minDis){
+                minDis = dis;
+                dir    = (Direction)i;
+            }
+        }
+
+        return (dir, edgePos[(int)dir]);
+    }
+
     IEnumerator CoMoveToStartPosition(){
+        var (nextDir, nextPosition)= GetNextPosition();
         var tr        = transform;
-        var dir       =  startPosition - tr.position;
+        var dir       = nextPosition - tr.position;
         var dirNormal = dir.normalized;
         var speed     = stageInfo.enemySpeed;
 
         while (true){
-            tr.position += dirNormal * (speed * 3 * Time.deltaTime);
+            tr.position += dirNormal * (speed * Time.deltaTime);
 
-            if (Vector3.Distance(tr.position, startPosition) <= 0.1f){
-                tr.position = startPosition;
+            if (Vector3.Distance(tr.position, nextPosition) <= 0.1f){
+                tr.position = nextPosition;
                 break;
             }
 
             yield return null;
         }
+        currentDir = nextDir;
         StartCoroutine(CoMove(speed));
     }
 
@@ -131,7 +127,16 @@ public class Block_Controller : MonoBehaviour{
     }
 
     IEnumerator CoMove(float speed){
-        var tr = transform;
+        var tr            = transform;
+        var startPosition = tr.position;
+        var endPosition   = startPosition;
+        if (moveDir == MoveDirection.Horizontal){
+            endPosition.x = startPosition.x * -1f;
+        }
+        else{
+            endPosition.y = startPosition.y * -1f;
+        }
+
 
         var dirPos       = (endPosition - startPosition);
         var dirNormalPos = dirPos.normalized;
@@ -139,8 +144,8 @@ public class Block_Controller : MonoBehaviour{
         while (true){
             var addPos   = Vector3.zero;
             var startPos = tr.position;
-            
-            while(true){
+
+            while (true){
                 var result = dirNormalPos * (speed * Time.deltaTime);
                 addPos      += result;
                 tr.position += result;
@@ -149,9 +154,10 @@ public class Block_Controller : MonoBehaviour{
                     tr.position = startPos + dirPos;
                     break;
                 }
+
                 yield return null;
             }
-            
+
             dirPos.Set(dirPos.x * -1f, dirPos.y * -1f, dirPos.z * -1f);
             dirNormalPos = dirPos.normalized;
         }

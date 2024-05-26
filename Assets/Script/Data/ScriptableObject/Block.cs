@@ -5,10 +5,10 @@ using System.Linq;
 using UnityEngine;
 
 public enum Direction{
-    Top,
-    Bottom,
-    Left,
-    Right,
+    TopLeft = 0,
+    TopRight,
+    BottomLeft,
+    BottomRight,
 }
 public enum BlockType{
     Circle,
@@ -17,10 +17,10 @@ public enum BlockType{
 
 [Serializable]
 public class Block {
-    public PoolingKey      poolingKey;
-    public BlockType       type;
-    public List<Direction> direction;
+    public PoolingKey poolingKey;
+    public BlockType  type;
+    public Direction  startDirection;
     public Block Clone(){
-        return new Block{ poolingKey = poolingKey, type = type, direction = direction.ToList() };
+        return new Block{ poolingKey = poolingKey, type = type, startDirection = startDirection };
     }
 }
